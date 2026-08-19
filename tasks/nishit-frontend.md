@@ -11,28 +11,28 @@ You are responsible for building the Next.js Frontend for **EmergencyAI**, ensur
 ## 📋 Task Checklist
 
 ### Phase 1: MVP Core (Priority)
-- [ ] **Setup Project Architecture**:
+- [x] **Setup Project Architecture**:
   - Next.js App Router setup under `frontend/src/app`.
   - Configure Tailwind CSS tokens (Dark mode theme with emergency accent colors: Red 🔴, Yellow 🟡, Green 🟢).
   - Setup Axios / API Client singleton in `src/services/api.ts` pointing to `NEXT_PUBLIC_API_BASE_URL`.
 
-- [ ] **Authentication Flow**:
-  - Page: `src/app/login/page.tsx` (Login & Register toggles).
+- [x] **Authentication Flow**:
+  - Page: `src/app/login/page.tsx` (Login & Register toggles + 1-Click Instant Demo Login buttons).
   - User role selection (`REPORTER` vs `ADMIN`).
   - Store JWT Token securely in `localStorage` / HTTP headers.
 
-- [ ] **Reporter Flow (Emergency Report Page)**:
+- [x] **Reporter Flow (Emergency Report Page)**:
   - Page: `src/app/report/page.tsx`.
   - Form Fields: Description (required), Emergency Type (dropdown/chips), Location address + GPS coords auto-detect.
   - Success toast & status viewer for submitted reports.
 
-- [ ] **Admin Dashboard View**:
+- [x] **Admin Dashboard View**:
   - Page: `src/app/admin/dashboard/page.tsx`.
   - **Metrics Summary Bar**: Cards displaying `Total Incidents`, `Active Incidents`, and `Critical Incidents`.
   - **Incidents Table / List View**: Columns for Type, Severity Badge (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`), Location, Report Count, Status Dropdown (`REPORTED`, `VERIFIED`, `RESPONDING`, `RESOLVED`), and Created Time.
   - Status change API handler (`PATCH /api/incidents/:id/status`).
 
-- [ ] **Incident Details & AI Summary Modal**:
+- [x] **Incident Details & AI Summary Modal**:
   - Modal component: `src/components/IncidentDetailModal.tsx`.
   - Displays AI Generated Incident Summary prominently.
   - Lists all underlying individual user reports merged into this incident.
@@ -40,7 +40,7 @@ You are responsible for building the Next.js Frontend for **EmergencyAI**, ensur
 ---
 
 ### Phase 2: Map & Enhancements
-- [ ] **Map View**:
+- [x] **Map View**:
   - Page/Component: `src/components/MapView.tsx`.
   - Integrate Mapbox GL JS to display incident pins geographically.
   - Color code markers by severity (🔴 Critical/High, 🟡 Medium, 🟢 Resolved).
