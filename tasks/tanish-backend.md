@@ -11,23 +11,23 @@ You are responsible for building the Node.js / Express backend server, MongoDB d
 ## 📋 Task Checklist
 
 ### Phase 1: MVP Core & Database (Priority)
-- [ ] **Server & Database Infrastructure**:
+- [x] **Server & Database Infrastructure**:
   - Express app entry point: `backend/src/server.js`.
   - MongoDB Atlas Mongoose connection in `src/config/db.js`.
   - CORS, `dotenv`, `express.json()` middleware setup.
 
-- [ ] **Mongoose Models**:
+- [x] **Mongoose Models**:
   - `src/models/User.js` (name, email, password hash, role).
   - `src/models/Report.js` (userId, description, location, emergencyType, incidentId).
   - `src/models/Incident.js` (type, severity, location, summary, status, reportCount, reportIds).
 
-- [ ] **Authentication APIs**:
+- [x] **Authentication APIs**:
   - Route: `src/routes/authRoutes.js`.
   - `POST /api/auth/register` (hash password using `bcryptjs`, issue JWT token).
   - `POST /api/auth/login` (validate credentials, issue JWT token).
   - Auth Middleware: `src/utils/authMiddleware.js` (verify JWT, check `ADMIN` role).
 
-- [ ] **AI Classification & Incident Management Pipeline**:
+- [x] **AI Classification & Incident Management Pipeline**:
   - Service module: `src/services/aiService.js`.
   - **AI Prompt 1: Single Report Classification**:
     - Input: Report description & optional emergency type.
@@ -36,7 +36,7 @@ You are responsible for building the Node.js / Express backend server, MongoDB d
     - Input: Array of report descriptions for an incident.
     - Output JSON: `{ "summary": "Multiple reports indicate a possible fire on the first floor of Block B.", "severity": "HIGH", "recommendedAction": "Evacuate Block B" }`
 
-- [ ] **Incident Management REST APIs**:
+- [x] **Incident Management REST APIs**:
   - Route: `src/routes/incidentRoutes.js`.
   - `GET /api/incidents` (Fetch incidents + summary statistics `{ total, active, critical }`).
   - `GET /api/incidents/:id` (Fetch single incident with linked reports).
@@ -45,7 +45,7 @@ You are responsible for building the Node.js / Express backend server, MongoDB d
 ---
 
 ### Phase 2: AI Duplicate Detection Engine ⭐
-- [ ] **Deduplication Logic** (`src/services/deduplicationService.js`):
+- [x] **Deduplication Logic** (`src/services/deduplicationService.js`):
   - When a new report is submitted:
     1. Query active incidents (status != `RESOLVED`) within past 2 hours.
     2. Filter by geographic proximity (Haversine formula or location text match).
