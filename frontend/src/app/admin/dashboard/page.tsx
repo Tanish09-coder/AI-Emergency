@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/services/api";
 import { Incident, IncidentsResponse, Report } from "@/types";
-import { ShieldAlert, Activity, AlertOctagon, RefreshCcw } from "lucide-react";
+import { ShieldAlert, Activity, AlertOctagon, RefreshCcw, FileText } from "lucide-react";
 import IncidentDetailModal from "@/components/IncidentDetailModal";
 
 export default function AdminDashboard() {
@@ -70,8 +70,8 @@ export default function AdminDashboard() {
     setIncidentReports([]);
     try {
       // Fetch full incident details including reports
-      const res = await api.get<{ incident: Incident, reports: Report[] }>(`/api/incidents/${incident._id}`);
-      setIncidentReports(res.data.reports || []); // Ensure fallback
+      const res = await api.get<any>(`/api/incidents/${incident._id}`);
+      setIncidentReports(res.data.reportIds || []);
     } catch (err) {
       console.error("Failed to fetch incident details", err);
     }
