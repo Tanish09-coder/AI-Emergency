@@ -3,16 +3,52 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/services/api";
-import { MapPin, Navigation, AlertTriangle, CheckCircle, Loader2 } from "lucide-react";
+import { MapPin, Navigation, AlertTriangle, CheckCircle, Loader2, Sparkles } from "lucide-react";
+
+const presetEmergencyData: Record<
+  string,
+  { description: string; address: string; coordinates: { lat: number; lng: number } }
+> = {
+  Fire: {
+    description: "Heavy smoke and flames coming from Block B first floor window room 102",
+    address: "Block B, First Floor",
+    coordinates: { lat: 12.9716, lng: 77.5946 },
+  },
+  Medical: {
+    description: "Student collapsed and unresponsive near main campus sports ground bleachers",
+    address: "Main Campus Sports Ground",
+    coordinates: { lat: 12.975, lng: 77.598 },
+  },
+  Accident: {
+    description: "Two vehicle collision near north gate entrance blocking main exit lane",
+    address: "North Gate Entrance Road",
+    coordinates: { lat: 12.978, lng: 77.592 },
+  },
+  Security: {
+    description: "Suspicious unauthorized intruder spotted attempting break-in near lab block",
+    address: "Science Lab Block, Rear Entrance",
+    coordinates: { lat: 12.973, lng: 77.5955 },
+  },
+  "Natural Disaster": {
+    description: "Storm water accumulation and heavy fallen tree branch blocking central avenue",
+    address: "Main Campus Central Avenue",
+    coordinates: { lat: 12.9745, lng: 77.596 },
+  },
+  Other: {
+    description: "Electrical short circuit and sparks emitting from distribution transformer panel",
+    address: "Engineering Block Substation",
+    coordinates: { lat: 12.9725, lng: 77.5935 },
+  },
+};
 
 export default function ReportPage() {
   const router = useRouter();
-  
+
   const [description, setDescription] = useState("");
   const [emergencyType, setEmergencyType] = useState("Other");
   const [address, setAddress] = useState("");
-  const [coordinates, setCoordinates] = useState<{lat: number, lng: number} | null>(null);
-  
+  const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
+
   const [loading, setLoading] = useState(false);
   const [detectingLocation, setDetectingLocation] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -20,7 +56,7 @@ export default function ReportPage() {
 
   const emergencyTypes = ["Fire", "Medical", "Accident", "Security", "Natural Disaster", "Other"];
 
-  // Ensure user is authenticated and is REPORTER
+  // Ensure user is authenticated
   useEffect(() => {
     const userStr = localStorage.getItem("user");
     if (!userStr) {
@@ -33,6 +69,16 @@ export default function ReportPage() {
     }
   }, [router]);
 
+  const handleSelectType = (type: string) => {
+    setEmergencyType(type);
+    const preset = presetEmergencyData[type];
+    if (preset) {
+      setDescription(preset.description);
+      setAddress(preset.address);
+      setCoordinates(preset.coordinates);
+    }
+  };
+
   const detectLocation = () => {
     setDetectingLocation(true);
     if ("geolocation" in navigator) {
@@ -40,9 +86,11 @@ export default function ReportPage() {
         (position) => {
           setCoordinates({
             lat: position.coords.latitude,
-            lng: position.coords.longitude
+            lng: position.coords.longitude,
           });
-          setAddress(`GPS: ${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`);
+          setAddress(
+            `GPS: ${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`
+          );
           setDetectingLocation(false);
         },
         (error) => {
@@ -68,16 +116,17 @@ export default function ReportPage() {
         emergencyType,
         location: {
           address,
-          coordinates: coordinates || undefined
-        }
+          coordinates: coordinates || undefined,
+        },
       });
       setSubmitSuccess(true);
+      
       // Reset form
       setDescription("");
       setAddress("");
       setCoordinates(null);
       setEmergencyType("Other");
-      
+
       // Hide success message after 5 seconds
       setTimeout(() => setSubmitSuccess(false), 5000);
     } catch (err: any) {
@@ -94,7 +143,7 @@ export default function ReportPage() {
           <AlertTriangle className="w-8 h-8 text-critical" />
           <h1 className="text-2xl font-bold">Submit Report</h1>
         </div>
-        <button 
+        <button
           onClick={() => {
             localStorage.removeItem("token");
             localStorage.removeItem("user");
@@ -107,7 +156,6 @@ export default function ReportPage() {
       </header>
 
       <main className="max-w-2xl mx-auto bg-surface p-6 md:p-8 rounded-2xl shadow-xl border border-slate-700">
-        
         {submitSuccess && (
           <div className="mb-6 p-4 bg-green-900/30 border border-green-500/50 rounded-lg flex items-center gap-3 text-green-200">
             <CheckCircle className="w-6 h-6 text-resolved shrink-0" />
@@ -125,20 +173,24 @@ export default function ReportPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          
-          {/* Emergency Type Selection */}
+          {/* Emergency Type Selection with Auto-Fill Database */}
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-3">Emergency Type</label>
+            <div className="flex justify-between items-center mb-3">
+              <label className="block text-sm font-medium text-slate-300">Emergency Type</label>
+              <span className="text-xs text-blue-400 flex items-center gap-1 font-medium">
+                <Sparkles className="w-3.5 h-3.5" /> Auto-fills description & location
+              </span>
+            </div>
             <div className="flex flex-wrap gap-2">
-              {emergencyTypes.map(type => (
+              {emergencyTypes.map((type) => (
                 <button
                   key={type}
                   type="button"
-                  onClick={() => setEmergencyType(type)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors border ${
-                    emergencyType === type 
-                      ? 'bg-blue-600 border-blue-500 text-white' 
-                      : 'bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-500'
+                  onClick={() => handleSelectType(type)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all border ${
+                    emergencyType === type
+                      ? "bg-blue-600 border-blue-500 text-white shadow-md shadow-blue-500/20 scale-105"
+                      : "bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-500"
                   }`}
                 >
                   {type}
@@ -149,7 +201,9 @@ export default function ReportPage() {
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">Description (Required)</label>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Description (Required)
+            </label>
             <textarea
               required
               rows={4}
@@ -184,7 +238,11 @@ export default function ReportPage() {
                 className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-3 rounded-lg flex items-center justify-center transition-colors disabled:opacity-50 border border-slate-600"
                 title="Use current location"
               >
-                {detectingLocation ? <Loader2 className="w-5 h-5 animate-spin" /> : <Navigation className="w-5 h-5" />}
+                {detectingLocation ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Navigation className="w-5 h-5" />
+                )}
               </button>
             </div>
           </div>
@@ -196,7 +254,6 @@ export default function ReportPage() {
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Submit Emergency Report"}
           </button>
-          
         </form>
       </main>
     </div>
