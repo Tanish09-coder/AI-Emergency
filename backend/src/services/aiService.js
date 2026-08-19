@@ -142,13 +142,22 @@ const checkDuplicateWithAI = async (newReport, candidateIncidents) => {
 
   const ai = getGeminiClient();
   if (!ai) {
-    // Basic text heuristic for fallback
-    const reportText = `${newReport.description} ${newReport.location?.address || ''}`.toLowerCase();
+    const repText = `${newReport.description} ${newReport.location?.address || ''} ${newReport.emergencyType || ''}`.toLowerCase();
+
     for (const incident of candidateIncidents) {
-      const incText = `${incident.summary} ${incident.location?.address || ''}`.toLowerCase();
-      const reportWords = newReport.description.toLowerCase().split(/\s+/).filter(w => w.length > 3);
-      const commonWords = reportWords.filter(word => incText.includes(word));
-      if (commonWords.length >= 2 || (incident.location?.address && newReport.location?.address && incident.location.address.toLowerCase() === newReport.location.address.toLowerCase())) {
+      const incText = `${incident.summary} ${incident.location?.address || ''} ${incident.type || ''}`.toLowerCase();
+      
+      const repTokens = repText.split(/[\s,.-]+/).filter(w => w.length >= 2);
+      const incTokens = incText.split(/[\s,.-]+/).filter(w => w.length >= 2);
+
+      const commonTokens = repTokens.filter(token => incTokens.includes(token));
+
+      const hasSameType = newReport.emergencyType && incident.type &&
+        newReport.emergencyType.toLowerCase() === incident.type.toLowerCase();
+
+      const hasCommonLocationToken = commonTokens.some(t => ['block', 'building', 'floor', 'hall', 'room', 'gate', 'street', 'wing', 'quadrangle'].includes(t));
+
+      if ((hasSameType && hasCommonLocationToken) || commonTokens.length >= 3) {
         return { isMatch: true, matchedIncidentId: incident._id.toString() };
       }
     }
